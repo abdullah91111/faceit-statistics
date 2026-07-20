@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FACEIT Analyzer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <span>FACEIT CS2</span>
+        <h1>Team Analyzer</h1>
+      </header>
+
+      <label>
+        API server
+        <input id="apiUrl" value="http://localhost:8001" />
+      </label>
+
+      <label>
+        Match ID or URL
+        <input id="matchId" placeholder="https://www.faceit.com/en/cs2/room/..." />
+      </label>
+
+      <label>
+        Players
+        <textarea id="friendly" rows="5">mirage_mind
+tradecraft
+flashpoint
+late_lurk
+site_lock</textarea>
+      </label>
+
+      <button id="analyze">Analyze</button>
+      <section id="result"></section>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

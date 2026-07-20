@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "FACEIT CS2 Team Analyzer",
+  "version": "0.1.0",
+  "description": "Analyze FACEIT CS2 rosters from a popup without exposing API keys.",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://www.faceit.com/*", "http://localhost:8000/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Analyze FACEIT teams"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.faceit.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

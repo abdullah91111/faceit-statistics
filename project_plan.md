@@ -22,8 +22,8 @@ This project aims to develop a web app and Chrome extension for analyzing FACEIT
 - PostgreSQL (prefer Supabase)
 
 ### AI
-- OpenRouter initially
-- Later support self-hosted models with vLLM
+- Deferred until after the statistics MVP
+- Later support readable generated reports, but never use an LLM for calculations
 
 ### Extension
 - Chrome Extension Manifest V3
@@ -42,7 +42,7 @@ FastAPI Backend
 |
 |------ PostgreSQL
 |
-|------ LLM
+|------ Optional report generator (later)
 ```
 
 ## Core Features
@@ -62,15 +62,16 @@ FastAPI Backend
 - Future: Use CS2 demo parsing for rush tendencies, site preference, lurking, and position heatmaps.
 
 ## AI Usage
+- Not part of the current MVP.
 - Do not use LLM for calculations.
 - Backend calculates statistics.
-- LLM only converts data into readable reports.
+- A future report generator may only convert calculated data into readable reports.
 
 ## API Endpoints
 - `GET /player/{id}`
 - `GET /match/{id}`
 - `POST /analyze/team`
-- `POST /ai/report`
+- Future: `POST /report`
 
 ## Development Order
 1. Create FastAPI backend
@@ -80,7 +81,7 @@ FastAPI Backend
 5. Build role detection
 6. Build team compatibility scoring
 7. Create React dashboard
-8. Add AI reports
+8. Add optional generated reports
 9. Build Chrome extension
 
 ## Coding Requirements
