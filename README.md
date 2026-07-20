@@ -15,13 +15,15 @@ Web app, FastAPI backend, and Chrome extension for pre-queue FACEIT CS2 analysis
 ### Backend
 
 ```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Copy-Item .env.example .env
-uvicorn main:app --port 8001
+cd C:\WorkStuff\Github\faceit-statistics
+python -m venv backend\.venv
+.\backend\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements.txt
+Copy-Item backend\.env.example backend\.env
+.\scripts\start-backend.ps1
 ```
+
+Run `.\scripts\start-backend.ps1` from the repository root. If you are already inside `backend`, run `python -m uvicorn main:app --port 8001` directly.
 
 Set `FACEIT_API_KEY` in `backend/.env` for live FACEIT data. FACEIT's docs recommend server-side API keys for server-hosted code and sending them to FACEIT as `Authorization: Bearer <api_key>`, so the frontend and extension call this backend instead of storing the key in browser code.
 
@@ -36,11 +38,13 @@ DATABASE_URL=postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/
 ### Frontend
 
 ```powershell
-cd frontend
-npm install
-Copy-Item .env.example .env
-npm run dev
+cd C:\WorkStuff\Github\faceit-statistics
+npm --prefix frontend install
+Copy-Item frontend\.env.example frontend\.env
+.\scripts\start-frontend.ps1
 ```
+
+Run `.\scripts\start-frontend.ps1` from the repository root. If you are already inside `frontend`, run `npm run dev -- --port 5173` directly.
 
 Open `http://localhost:5173`.
 

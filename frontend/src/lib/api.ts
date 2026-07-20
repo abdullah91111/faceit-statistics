@@ -1,4 +1,4 @@
-import type { MatchAnalysisResponse, MatchRosterAnalysisResponse, Player, TeamCompatibilityResponse } from "../types/api";
+import type { ConfigStatus, MatchAnalysisResponse, MatchRosterAnalysisResponse, Player, TeamCompatibilityResponse } from "../types/api";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8001";
 
@@ -16,6 +16,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export function getPlayer(id: string): Promise<Player> {
   return request<Player>(`/player/${encodeURIComponent(id)}`);
+}
+
+export function getConfigStatus(): Promise<ConfigStatus> {
+  return request<ConfigStatus>("/config/status");
 }
 
 export function analyzeTeam(players: Player[]): Promise<TeamCompatibilityResponse> {

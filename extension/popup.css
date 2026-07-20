@@ -3,7 +3,7 @@
 }
 
 body {
-  width: 360px;
+  width: 390px;
   margin: 0;
   background: #101214;
   color: #f4f4f5;
@@ -26,6 +26,11 @@ span {
 h1 {
   margin: 3px 0 0;
   font-size: 22px;
+}
+
+h2 {
+  margin: 4px 0 0;
+  font-size: 17px;
 }
 
 label {
@@ -77,7 +82,7 @@ button:disabled {
   border: 1px solid #2a3036;
   border-radius: 6px;
   background: #181c20;
-  padding: 10px;
+  padding: 12px;
 }
 
 .role {
@@ -89,4 +94,15 @@ button:disabled {
 
 .muted {
   color: #a1a1aa;
+}
+
+.columns {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+ul {
+  margin: 8px 0 0;
+  padding-left: 16px;
 }

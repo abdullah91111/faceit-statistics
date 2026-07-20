@@ -36,14 +36,14 @@ async def get_player(player_id: str) -> Player:
     return await faceit.get_player(player_id)
 
 
-@router.get("/match/{match_id}")
-async def get_match(match_id: str) -> dict:
-    return await faceit.get_match(match_id)
-
-
 @router.get("/match/{match_id}/analysis", response_model=MatchRosterAnalysisResponse)
 async def get_match_analysis(match_id: str) -> MatchRosterAnalysisResponse:
     return await faceit.analyze_match_by_id(match_id)
+
+
+@router.get("/match/{match_id}")
+async def get_match(match_id: str) -> dict:
+    return await faceit.get_match(match_id)
 
 
 @router.post("/analyze/team", response_model=TeamCompatibilityResponse)

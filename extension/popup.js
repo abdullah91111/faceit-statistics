@@ -36,7 +36,7 @@ analyze.addEventListener("click", async () => {
 async function getMatchAnalysis(value) {
   const id = value.trim().replace(/\/$/, "").split("/").pop();
   const response = await fetch(`${apiUrl.value}/match/${encodeURIComponent(id)}/analysis`);
-  if (!response.ok) throw new Error("Could not analyze match");
+  if (!response.ok) throw new Error(await response.text());
   return response.json();
 }
 
@@ -52,7 +52,7 @@ async function postJson(path, body) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!response.ok) throw new Error("Backend analysis failed");
+  if (!response.ok) throw new Error(await response.text());
   return response.json();
 }
 
@@ -60,12 +60,17 @@ function renderAnalysis(analysis) {
   const roles = analysis.roles
     .map((role) => `<div class="role"><strong>${escapeHtml(role.nickname)}</strong><span>${role.role} ${Math.round(role.confidence * 100)}%</span></div>`)
     .join("");
+  const strengths = analysis.strengths.map((strength) => `<li>${escapeHtml(strength)}</li>`).join("");
   const risks = analysis.risks.map((risk) => `<li>${escapeHtml(risk)}</li>`).join("");
   return `
     <div class="panel">
       <div class="muted">Compatibility</div>
-      <h2>${analysis.score}/10 · ${analysis.grade}</h2>
+      <h2>${analysis.score}/10 - ${analysis.grade}</h2>
       ${roles}
+    </div>
+    <div class="panel">
+      <strong>Strengths</strong>
+      <ul>${strengths}</ul>
     </div>
     <div class="panel">
       <strong>Risks</strong>
@@ -75,17 +80,27 @@ function renderAnalysis(analysis) {
 }
 
 function renderMatch(match) {
+  const scout = match.analysis.scouting;
+  const strong = scout.strong_players.map((name) => `<li>${escapeHtml(name)}</li>`).join("");
+  const targets = scout.weak_players.map((name) => `<li>${escapeHtml(name)}</li>`).join("");
   return `
     <div class="panel">
       <div class="muted">${escapeHtml(match.status || "match")}</div>
       <h2>${escapeHtml(match.teams[0].name)} vs ${escapeHtml(match.teams[1].name)}</h2>
     </div>
     ${renderAnalysis(match.analysis.friendly)}
+    <div class="panel">
+      <strong>Enemy Scout</strong>
+      <div class="columns">
+        <div><span class="muted">Strong</span><ul>${strong}</ul></div>
+        <div><span class="muted">Targets</span><ul>${targets}</ul></div>
+      </div>
+    </div>
   `;
 }
 
 function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, (char) => ({
+  return String(value).replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",

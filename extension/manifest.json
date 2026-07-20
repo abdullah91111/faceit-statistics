@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Analyze FACEIT CS2 rosters from a popup without exposing API keys.",
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["https://www.faceit.com/*", "http://localhost:8000/*"],
+  "host_permissions": ["https://www.faceit.com/*", "http://localhost:8001/*"],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Analyze FACEIT teams"
