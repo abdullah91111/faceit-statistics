@@ -7,12 +7,26 @@ RoleName = Literal["Entry", "AWPer", "Support", "Lurker", "Anchor", "Rifler"]
 
 class PlayerStats(BaseModel):
     kd_ratio: float = Field(ge=0, le=5)
+    kpr: float = Field(default=0.0, ge=0, le=2)
     adr: float = Field(ge=0, le=200)
     headshot_percent: float = Field(ge=0, le=100)
     opening_kill_rate: float = Field(ge=0, le=1)
+    entry_success_rate: float = Field(default=0.0, ge=0, le=1)
+    total_entry_count: int = Field(default=0, ge=0)
+    total_entry_wins: int = Field(default=0, ge=0)
     assists_per_round: float = Field(ge=0, le=2)
     survival_rate: float = Field(ge=0, le=1)
     clutch_rate: float = Field(default=0.0, ge=0, le=1)
+    clutch_1v1_win_rate: float = Field(default=0.0, ge=0, le=1)
+    clutch_1v2_win_rate: float = Field(default=0.0, ge=0, le=1)
+    sniper_kill_rate: float = Field(default=0.0, ge=0, le=1)
+    sniper_kills_per_round: float = Field(default=0.0, ge=0, le=1)
+    total_sniper_kills: int = Field(default=0, ge=0)
+    flashes_per_round: float = Field(default=0.0, ge=0, le=2)
+    enemies_flashed_per_round: float = Field(default=0.0, ge=0, le=2)
+    flash_success_rate: float = Field(default=0.0, ge=0, le=1)
+    utility_damage_per_round: float = Field(default=0.0, ge=0, le=200)
+    utility_usage_per_round: float = Field(default=0.0, ge=0, le=2)
     recent_win_rate: float = Field(default=0.5, ge=0, le=1)
     matches_played: int = Field(default=0, ge=0)
 
@@ -39,6 +53,7 @@ class RoleDetection(BaseModel):
     role: RoleName
     confidence: float = Field(ge=0, le=1)
     signals: list[str]
+    score_breakdown: dict[RoleName, float]
 
 
 class TeamAnalysisRequest(BaseModel):
@@ -55,9 +70,21 @@ class TeamCompatibilityResponse(BaseModel):
     grade: Literal["S", "A", "B", "C", "D"]
     roles: list[RoleDetection]
     coverage: list[RoleCoverage]
+    firepower_score: float = Field(ge=0, le=10)
+    role_balance_score: float = Field(ge=0, le=10)
+    form_score: float = Field(ge=0, le=10)
+    utility_score: float = Field(ge=0, le=10)
+    clutch_score: float = Field(ge=0, le=10)
     strengths: list[str]
     risks: list[str]
     recommendations: list[str]
+
+
+class WinProbabilityResponse(BaseModel):
+    friendly_percent: int = Field(ge=0, le=100)
+    enemy_percent: int = Field(ge=0, le=100)
+    confidence: Literal["low", "medium", "high"]
+    reasons: list[str]
 
 
 class MatchTeam(BaseModel):
@@ -82,6 +109,7 @@ class MatchAnalysisResponse(BaseModel):
     friendly: TeamCompatibilityResponse
     enemy: TeamCompatibilityResponse
     scouting: EnemyScoutingResponse
+    win_probability: WinProbabilityResponse
 
 
 class MatchRosterTeam(BaseModel):

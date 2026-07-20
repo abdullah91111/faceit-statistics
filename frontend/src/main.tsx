@@ -134,12 +134,13 @@ function App() {
             {error ? <div className="mt-4 rounded border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">{error}</div> : null}
           </section>
 
-          {match && team ? <OverviewGrid friendly={team} enemy={match.enemy} /> : null}
+          {match && team ? <OverviewGrid match={match} /> : null}
         </div>
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-6 lg:grid-cols-[390px_1fr] lg:px-8">
         <aside className="space-y-5">
+          {match ? <WinProbabilityPanel match={match} /> : null}
           {team ? <ScorePanel title="Friendly Readiness" icon={<Shield size={18} />} analysis={team} /> : null}
           {match ? <ScoutingPanel analysis={match} /> : null}
           {match ? <RoleCoveragePanel friendly={match.friendly} enemy={match.enemy} /> : null}
@@ -159,6 +160,28 @@ function App() {
         </div>
       </section>
     </main>
+  );
+}
+
+function WinProbabilityPanel({ match }: { match: MatchAnalysisResponse }) {
+  return (
+    <div className="rounded border border-line bg-panel p-5">
+      <h2 className="flex items-center gap-2 text-base font-semibold"><Target size={18} /> Win Probability</h2>
+      <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div>
+          <p className="text-4xl font-semibold text-aqua">{match.win_probability.friendly_percent}%</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-zinc-500">Friendly</p>
+        </div>
+        <div className="text-zinc-600">vs</div>
+        <div className="text-right">
+          <p className="text-4xl font-semibold text-faceit">{match.win_probability.enemy_percent}%</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-zinc-500">Enemy</p>
+        </div>
+      </div>
+      <Meter value={match.win_probability.friendly_percent} max={100} />
+      <p className="mt-3 text-sm text-zinc-400">Confidence: {match.win_probability.confidence}</p>
+      <ListBlock title="Reasons" items={match.win_probability.reasons} />
+    </div>
   );
 }
 
@@ -201,10 +224,18 @@ function MetaItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function OverviewGrid({ friendly, enemy }: { friendly: TeamCompatibilityResponse; enemy: TeamCompatibilityResponse }) {
+function OverviewGrid({ match }: { match: MatchAnalysisResponse }) {
+  const friendly = match.friendly;
+  const enemy = match.enemy;
   const edge = Number((friendly.score - enemy.score).toFixed(1));
   return (
-    <div className="grid gap-3 md:grid-cols-3">
+    <div className="grid gap-3 md:grid-cols-4">
+      <MetricCard
+        icon={<Target size={19} />}
+        label="Win Chance"
+        value={`${match.win_probability.friendly_percent}%`}
+        sub={`${match.win_probability.confidence} confidence`}
+      />
       <MetricCard icon={<Gauge size={19} />} label="Friendly Score" value={`${friendly.score}/10`} sub={`Grade ${friendly.grade}`} />
       <MetricCard icon={<Swords size={19} />} label="Enemy Score" value={`${enemy.score}/10`} sub={`Grade ${enemy.grade}`} />
       <MetricCard icon={<BarChart3 size={19} />} label="Score Edge" value={edge > 0 ? `+${edge}` : `${edge}`} sub={edge >= 0 ? "favorable" : "enemy favored"} />
@@ -278,9 +309,33 @@ function ScorePanel({ title, icon, analysis }: { title: string; icon: React.Reac
         <div className="grade-badge">{analysis.grade}</div>
       </div>
       <Meter value={analysis.score} max={10} />
+      <ComponentScores analysis={analysis} />
       <ListBlock title="Strengths" items={analysis.strengths} icon={<CheckCircle2 size={15} />} />
       <ListBlock title="Risks" items={analysis.risks} icon={<AlertTriangle size={15} />} />
       <ListBlock title="Recommendations" items={analysis.recommendations} icon={<Target size={15} />} />
+    </div>
+  );
+}
+
+function ComponentScores({ analysis }: { analysis: TeamCompatibilityResponse }) {
+  const rows = [
+    ["Roles", analysis.role_balance_score],
+    ["Firepower", analysis.firepower_score],
+    ["Form", analysis.form_score],
+    ["Utility", analysis.utility_score],
+    ["Clutch", analysis.clutch_score],
+  ] as const;
+  return (
+    <div className="mt-4 grid gap-2">
+      {rows.map(([label, value]) => (
+        <div className="grid grid-cols-[78px_1fr_34px] items-center gap-2 text-xs" key={label}>
+          <span className="text-zinc-500">{label}</span>
+          <div className="h-2 rounded bg-ink">
+            <div className="h-full rounded bg-aqua" style={{ width: `${value * 10}%` }} />
+          </div>
+          <span className="text-right text-zinc-400">{value.toFixed(1)}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -363,11 +418,35 @@ function PlayerCard({ player, role, accent }: { player: Player; role?: TeamCompa
       <div className="mt-4 grid grid-cols-4 gap-2 text-center text-xs">
         <Stat label="K/D" value={player.stats.kd_ratio.toFixed(2)} />
         <Stat label="ADR" value={player.stats.adr.toFixed(0)} />
-        <Stat label="HS" value={`${player.stats.headshot_percent.toFixed(0)}%`} />
+        <Stat label="K/R" value={player.stats.kpr.toFixed(2)} />
         <Stat label="Win" value={`${Math.round(player.stats.recent_win_rate * 100)}%`} />
       </div>
+      <div className="mt-2 grid grid-cols-4 gap-2 text-center text-xs">
+        <Stat label="Entry" value={`${Math.round(player.stats.opening_kill_rate * 100)}%`} />
+        <Stat label="Sniper" value={`${Math.round(player.stats.sniper_kill_rate * 100)}%`} />
+        <Stat label="Flash" value={player.stats.enemies_flashed_per_round.toFixed(2)} />
+        <Stat label="Clutch" value={`${Math.round(player.stats.clutch_1v1_win_rate * 100)}%`} />
+      </div>
       {role ? <p className="mt-3 text-sm leading-6 text-zinc-300">{role.signals.join(" - ")} - {Math.round(role.confidence * 100)}% confidence</p> : null}
+      {role ? <RoleBreakdown role={role} /> : null}
     </article>
+  );
+}
+
+function RoleBreakdown({ role }: { role: TeamCompatibilityResponse["roles"][number] }) {
+  const entries = Object.entries(role.score_breakdown).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return (
+    <div className="mt-3 grid gap-1.5">
+      {entries.map(([name, value]) => (
+        <div className="grid grid-cols-[64px_1fr_34px] items-center gap-2 text-xs" key={name}>
+          <span className="text-zinc-500">{name}</span>
+          <div className="h-1.5 rounded bg-ink">
+            <div className="h-full rounded bg-faceit" style={{ width: `${Math.min(value, 100)}%` }} />
+          </div>
+          <span className="text-right text-zinc-400">{value.toFixed(0)}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 

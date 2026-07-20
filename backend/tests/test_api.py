@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
 
 from main import app
+from app.models.schemas import Player, PlayerStats
+from app.services.role_detection import detect_role
 
 
 client = TestClient(app)
@@ -29,6 +31,8 @@ def test_team_analysis() -> None:
     body = response.json()
     assert 0 <= body["score"] <= 10
     assert len(body["roles"]) == 5
+    assert "firepower_score" in body
+    assert "utility_score" in body
 
 
 def test_match_analysis_autofills_rosters() -> None:
@@ -39,3 +43,45 @@ def test_match_analysis_autofills_rosters() -> None:
     assert len(body["teams"]) == 2
     assert len(body["teams"][0]["players"]) == 5
     assert len(body["teams"][1]["players"]) == 5
+    assert body["analysis"]["win_probability"]["friendly_percent"] + body["analysis"]["win_probability"]["enemy_percent"] == 100
+
+
+def test_sniper_stats_detect_awper() -> None:
+    player = Player(
+        id="awp",
+        nickname="scope",
+        stats=PlayerStats(
+            kd_ratio=1.22,
+            kpr=0.72,
+            adr=75,
+            headshot_percent=38,
+            opening_kill_rate=0.13,
+            entry_success_rate=0.48,
+            assists_per_round=0.1,
+            survival_rate=0.46,
+            sniper_kill_rate=0.24,
+            sniper_kills_per_round=0.17,
+            total_sniper_kills=500,
+        ),
+    )
+    assert detect_role(player).role == "AWPer"
+
+
+def test_entry_stats_detect_entry() -> None:
+    player = Player(
+        id="entry",
+        nickname="space",
+        stats=PlayerStats(
+            kd_ratio=1.05,
+            kpr=0.76,
+            adr=88,
+            headshot_percent=49,
+            opening_kill_rate=0.23,
+            entry_success_rate=0.6,
+            total_entry_count=440,
+            total_entry_wins=264,
+            assists_per_round=0.1,
+            survival_rate=0.34,
+        ),
+    )
+    assert detect_role(player).role == "Entry"
