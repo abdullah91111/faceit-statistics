@@ -16,6 +16,14 @@ def test_config_status() -> None:
     assert body["llm_enabled"] is False
 
 
+def test_api_prefix_routes_for_vercel() -> None:
+    response = client.get("/api/config/status")
+    assert response.status_code == 200
+    match = client.get("/api/match/demo-match/analysis")
+    assert match.status_code == 200
+    assert match.json()["match_id"] == "demo-match"
+
+
 def test_demo_player_lookup() -> None:
     response = client.get("/player/mirage_mind")
     assert response.status_code == 200

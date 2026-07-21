@@ -62,6 +62,26 @@ Invoke-RestMethod http://localhost:8001/player/donk
 Invoke-RestMethod http://localhost:8001/match/demo-match/analysis
 ```
 
+## Vercel
+
+This repo is configured for one Vercel project with two services:
+
+- `frontend`: Vite app from `frontend`
+- `backend`: FastAPI app from `backend`
+
+Set this environment variable in Vercel:
+
+```env
+FACEIT_API_KEY=your_faceit_api_key
+```
+
+In production, the frontend calls the backend through `/api`, for example:
+
+```text
+/api/config/status
+/api/match/demo-match/analysis
+```
+
 ### Chrome Extension
 
 1. Open `chrome://extensions`.
