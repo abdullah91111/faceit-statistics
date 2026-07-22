@@ -16,6 +16,12 @@ button {
   min-height: 2.75rem;
 }
 
+.hero-shell {
+  background:
+    linear-gradient(135deg, rgba(17, 20, 24, 0.96) 0%, rgba(23, 27, 32, 0.94) 48%, rgba(16, 18, 20, 1) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 88px);
+}
+
 .command-panel {
   border: 1px solid #2a3036;
   border-radius: 0.5rem;
@@ -60,6 +66,10 @@ button {
   font-weight: 700;
   color: white;
   transition: background 160ms ease, transform 160ms ease;
+}
+
+.primary-button:active {
+  transform: translateY(1px);
 }
 
 .primary-button:hover {

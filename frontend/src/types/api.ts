@@ -97,10 +97,3 @@ export interface MatchRosterAnalysisResponse {
   teams: MatchRosterTeam[];
   analysis: MatchAnalysisResponse;
 }
-
-export interface ConfigStatus {
-  faceit_api_key: boolean;
-  database_url: boolean;
-  database_required_for_mvp: boolean;
-  llm_enabled: boolean;
-}

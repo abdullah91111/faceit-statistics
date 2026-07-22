@@ -16,24 +16,21 @@ import {
   Users,
 } from "lucide-react";
 
-import { analyzeMatch, analyzeMatchId, analyzeTeam, getConfigStatus, getPlayer } from "./lib/api";
-import type { ConfigStatus, MatchAnalysisResponse, Player, RoleName, TeamCompatibilityResponse } from "./types/api";
+import { analyzeMatch, analyzeMatchId, analyzeTeam, getPlayer } from "./lib/api";
+import type { MatchAnalysisResponse, Player, RoleName, TeamCompatibilityResponse } from "./types/api";
 import "./styles.css";
 
-const demoFriendly = ["mirage_mind", "tradecraft", "flashpoint", "late_lurk", "site_lock"];
-const demoEnemy = ["sharp_lane", "anchorbyte", "scopefield", "popflash", "underpass"];
 const roleOrder: RoleName[] = ["Entry", "AWPer", "Support", "Lurker", "Anchor", "Rifler"];
 
 function App() {
-  const [matchId, setMatchId] = React.useState("demo-match");
+  const [matchId, setMatchId] = React.useState("");
   const [matchMeta, setMatchMeta] = React.useState<{ id: string; status?: string; url?: string; teamNames: string[] } | null>(null);
-  const [friendlyNames, setFriendlyNames] = React.useState(demoFriendly.join("\n"));
-  const [enemyNames, setEnemyNames] = React.useState(demoEnemy.join("\n"));
+  const [friendlyNames, setFriendlyNames] = React.useState("");
+  const [enemyNames, setEnemyNames] = React.useState("");
   const [friendly, setFriendly] = React.useState<Player[]>([]);
   const [enemy, setEnemy] = React.useState<Player[]>([]);
   const [team, setTeam] = React.useState<TeamCompatibilityResponse | null>(null);
   const [match, setMatch] = React.useState<MatchAnalysisResponse | null>(null);
-  const [config, setConfig] = React.useState<ConfigStatus | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
@@ -89,56 +86,62 @@ function App() {
     }
   }
 
-  React.useEffect(() => {
-    getConfigStatus().then(setConfig).catch(() => setConfig(null));
-    void loadMatch();
-  }, []);
-
   return (
     <main className="min-h-screen bg-ink text-zinc-100">
-      <section className="border-b border-line bg-[linear-gradient(135deg,#111418_0%,#171b20_52%,#101214_100%)]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-7 lg:px-8">
-          <header className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <section className="hero-shell border-b border-line">
+        <div className="mx-auto flex min-h-[620px] max-w-7xl flex-col gap-7 px-5 py-8 lg:px-8">
+          <header className="flex flex-col gap-5">
             <div>
               <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-faceit">
                 <Crosshair size={15} />
-                FACEIT CS2 Match Intel
+                FACEIT CS2 Team Analyzer
               </div>
-              <h1 className="mt-3 text-3xl font-semibold tracking-normal md:text-5xl">Pre-Queue Command Center</h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-300">
-                Load a FACEIT match, auto-fill both rosters, and get role balance, form, map comfort, and enemy scouting from code-calculated stats.
+              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal md:text-6xl">Know your match before the first round.</h1>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300">
+                Paste a FACEIT CS2 match room link and get both teams auto-filled, role detection, win chance, enemy scouting, and map/player signals calculated from FACEIT stats.
               </p>
             </div>
-            <StatusStrip config={config} />
           </header>
 
-          <section className="command-panel">
-            <label className="field-label" htmlFor="matchId">
-              <Link size={18} />
-              Match ID or FACEIT URL
-            </label>
-            <div className="flex flex-col gap-3 lg:flex-row">
-              <input
-                id="matchId"
-                className="control-input min-h-12 flex-1"
-                value={matchId}
-                onChange={(event) => setMatchId(event.target.value)}
-                placeholder="https://www.faceit.com/en/cs2/room/..."
-              />
-              <button className="primary-button min-w-40" onClick={loadMatch} disabled={loading}>
-                {loading ? <RefreshCw className="animate-spin" size={18} /> : <Search size={18} />}
-                {loading ? "Loading" : "Load Match"}
-              </button>
+          <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="command-panel">
+              <label className="field-label" htmlFor="matchId">
+                <Link size={18} />
+                Match ID or FACEIT room URL
+              </label>
+              <div className="flex flex-col gap-3 lg:flex-row">
+                <input
+                  id="matchId"
+                  className="control-input min-h-12 flex-1"
+                  value={matchId}
+                  onChange={(event) => setMatchId(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") void loadMatch();
+                  }}
+                  placeholder="Paste a FACEIT room URL or match id"
+                />
+                <button className="primary-button min-w-40" onClick={loadMatch} disabled={loading}>
+                  {loading ? <RefreshCw className="animate-spin" size={18} /> : <Search size={18} />}
+                  {loading ? "Analyzing" : "Analyze Match"}
+                </button>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-zinc-400">
+                Works best with URLs like <span className="font-mono text-zinc-300">faceit.com/en/cs2/room/...</span>. If you paste a scoreboard URL, use the room id part.
+              </p>
+              {matchMeta ? <MatchMeta meta={matchMeta} /> : null}
+              {error ? <div className="mt-4 rounded border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">{error}</div> : null}
             </div>
-            {matchMeta ? <MatchMeta meta={matchMeta} /> : null}
-            {error ? <div className="mt-4 rounded border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">{error}</div> : null}
+
+            <HowItWorks />
           </section>
 
           {match && team ? <OverviewGrid match={match} /> : null}
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-6 lg:grid-cols-[390px_1fr] lg:px-8">
+      {!match ? <EmptyState /> : null}
+
+      {match ? <section className="mx-auto grid max-w-7xl gap-5 px-5 py-6 lg:grid-cols-[390px_1fr] lg:px-8">
         <aside className="space-y-5">
           {match ? <WinProbabilityPanel match={match} /> : null}
           {team ? <ScorePanel title="Friendly Readiness" icon={<Shield size={18} />} analysis={team} /> : null}
@@ -158,8 +161,43 @@ function App() {
           <RosterPanel title={matchMeta?.teamNames[0] ?? "Friendly Roles"} players={friendly} analysis={team} accent="friendly" />
           {match ? <RosterPanel title={matchMeta?.teamNames[1] ?? "Enemy Roles"} players={enemy} analysis={match.enemy} accent="enemy" /> : null}
         </div>
-      </section>
+      </section> : null}
     </main>
+  );
+}
+
+function HowItWorks() {
+  return (
+    <div className="rounded border border-line bg-panel/90 p-5">
+      <h2 className="flex items-center gap-2 text-base font-semibold"><Activity size={18} /> What you get</h2>
+      <div className="mt-4 grid gap-3">
+        <FeatureLine title="Auto rosters" text="Reads both teams from the FACEIT match." />
+        <FeatureLine title="Role detection" text="Entry, AWPer, Support, Lurker, Anchor, Rifler." />
+        <FeatureLine title="Win chance" text="Calculated from role balance, form, ELO, utility, and firepower." />
+        <FeatureLine title="Enemy scout" text="Strong players, targets, map comfort, and playstyle signals." />
+      </div>
+    </div>
+  );
+}
+
+function FeatureLine({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded border border-line bg-ink/70 p-3">
+      <p className="text-sm font-semibold text-zinc-100">{title}</p>
+      <p className="mt-1 text-sm leading-5 text-zinc-500">{text}</p>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <section className="mx-auto max-w-7xl px-5 py-7 lg:px-8">
+      <div className="grid gap-4 md:grid-cols-3">
+        <MetricCard icon={<Target size={19} />} label="Prediction" value="Win %" sub="team chance from stats" />
+        <MetricCard icon={<Users size={19} />} label="Roles" value="6" sub="detected player profiles" />
+        <MetricCard icon={<BarChart3 size={19} />} label="Signals" value="20+" sub="entry, sniper, utility, clutch" />
+      </div>
+    </section>
   );
 }
 
@@ -181,26 +219,6 @@ function WinProbabilityPanel({ match }: { match: MatchAnalysisResponse }) {
       <Meter value={match.win_probability.friendly_percent} max={100} />
       <p className="mt-3 text-sm text-zinc-400">Confidence: {match.win_probability.confidence}</p>
       <ListBlock title="Reasons" items={match.win_probability.reasons} />
-    </div>
-  );
-}
-
-function StatusStrip({ config }: { config: ConfigStatus | null }) {
-  return (
-    <div className="grid min-w-72 gap-2 sm:grid-cols-2">
-      <StatusPill label="FACEIT API" enabled={config?.faceit_api_key ?? false} />
-      <StatusPill label="Database" enabled={config?.database_url ?? false} muted="optional" />
-      <StatusPill label="LLM" enabled={false} muted="off" />
-      <StatusPill label="MVP Mode" enabled />
-    </div>
-  );
-}
-
-function StatusPill({ label, enabled, muted }: { label: string; enabled: boolean; muted?: string }) {
-  return (
-    <div className="flex items-center justify-between rounded border border-line bg-panel/90 px-3 py-2 text-xs">
-      <span className="text-zinc-400">{label}</span>
-      <span className={enabled ? "text-aqua" : "text-zinc-500"}>{enabled ? "ready" : muted ?? "missing"}</span>
     </div>
   );
 }
