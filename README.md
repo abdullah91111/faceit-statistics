@@ -23,7 +23,7 @@ Copy-Item backend\.env.example backend\.env
 .\scripts\start-backend.ps1
 ```
 
-Run `.\scripts\start-backend.ps1` from the repository root. If you are already inside `backend`, run `python -m uvicorn main:app --port 8001` directly.
+Run `.\scripts\start-backend.ps1` from the repository root. If you are already inside `backend`, run `python -m uvicorn main:app --port 8001` directly. update.
 
 Set `FACEIT_API_KEY` in `backend/.env` for live FACEIT data. FACEIT's docs recommend server-side API keys for server-hosted code and sending them to FACEIT as `Authorization: Bearer <api_key>`, so the frontend and extension call this backend instead of storing the key in browser code.
 
