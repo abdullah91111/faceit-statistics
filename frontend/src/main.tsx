@@ -89,6 +89,7 @@ function App() {
   return (
     <main className="min-h-screen bg-ink text-zinc-100">
       <section className="hero-shell border-b border-line">
+        <BackgroundNodes />
         <div className="arena-radar" aria-hidden="true">
           <div className="radar-ring ring-one" />
           <div className="radar-ring ring-two" />
@@ -173,6 +174,147 @@ function App() {
       </section> : null}
     </main>
   );
+}
+
+function BackgroundNodes() {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const cnv = canvas;
+    const ctx = context;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const nodes = Array.from({ length: 34 }, (_, index) => ({
+      x: ((index * 137) % 1000) / 1000,
+      y: ((index * 271) % 1000) / 1000,
+      vx: (((index * 19) % 17) - 8) * 0.018,
+      vy: (((index * 23) % 19) - 9) * 0.016,
+      size: 2.5 + (index % 4),
+      tone: index % 3 === 0 ? "orange" : "teal" as "orange" | "teal",
+    }));
+
+    let width = 0;
+    let height = 0;
+    let animationFrame = 0;
+    const pointer = { x: -9999, y: -9999, force: 0 };
+
+    function resize() {
+      const rect = cnv.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      width = rect.width;
+      height = rect.height;
+      cnv.width = Math.max(1, Math.floor(width * ratio));
+      cnv.height = Math.max(1, Math.floor(height * ratio));
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function setPointer(event: PointerEvent, force = 1) {
+      const rect = cnv.getBoundingClientRect();
+      pointer.x = event.clientX - rect.left;
+      pointer.y = event.clientY - rect.top;
+      pointer.force = force;
+    }
+
+    function clearPointer() {
+      pointer.x = -9999;
+      pointer.y = -9999;
+      pointer.force = 0;
+    }
+
+    function drawNode(x: number, y: number, size: number, tone: "orange" | "teal") {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = tone === "orange" ? "rgba(255, 85, 0, 0.82)" : "rgba(25, 211, 197, 0.72)";
+      ctx.shadowColor = tone === "orange" ? "rgba(255, 85, 0, 0.45)" : "rgba(25, 211, 197, 0.35)";
+      ctx.shadowBlur = 12;
+      ctx.fillRect(-size / 2, -size / 2, size, size);
+      ctx.restore();
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, width, height);
+
+      for (const node of nodes) {
+        const px = node.x * width;
+        const py = node.y * height;
+        const dx = px - pointer.x;
+        const dy = py - pointer.y;
+        const distance = Math.max(Math.hypot(dx, dy), 1);
+
+        if (distance < 170) {
+          const repel = (1 - distance / 170) * pointer.force * 0.015;
+          node.vx += (dx / distance) * repel;
+          node.vy += (dy / distance) * repel;
+        }
+
+        if (!prefersReducedMotion) {
+          node.x += node.vx / Math.max(width, 1);
+          node.y += node.vy / Math.max(height, 1);
+          node.vx *= 0.992;
+          node.vy *= 0.992;
+        }
+
+        if (node.x < 0.02 || node.x > 0.98) node.vx *= -1;
+        if (node.y < 0.08 || node.y > 0.92) node.vy *= -1;
+        node.x = Math.min(0.98, Math.max(0.02, node.x));
+        node.y = Math.min(0.92, Math.max(0.08, node.y));
+      }
+
+      for (let i = 0; i < nodes.length; i += 1) {
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const ax = a.x * width;
+          const ay = a.y * height;
+          const bx = b.x * width;
+          const by = b.y * height;
+          const distance = Math.hypot(ax - bx, ay - by);
+          if (distance < 145) {
+            const alpha = (1 - distance / 145) * 0.18;
+            ctx.strokeStyle = a.tone === b.tone ? `rgba(25, 211, 197, ${alpha})` : `rgba(255, 85, 0, ${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(bx, by);
+            ctx.stroke();
+          }
+        }
+      }
+
+      for (const node of nodes) {
+        drawNode(node.x * width, node.y * height, node.size, node.tone);
+      }
+
+      pointer.force *= 0.94;
+      animationFrame = window.requestAnimationFrame(frame);
+    }
+
+    resize();
+    frame();
+    const handlePointerMove = (event: PointerEvent) => setPointer(event, 0.55);
+    const handlePointerDown = (event: PointerEvent) => setPointer(event, 2.8);
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointerleave", clearPointer);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointerleave", clearPointer);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="background-nodes" aria-hidden="true" />;
 }
 
 function HowItWorks() {
