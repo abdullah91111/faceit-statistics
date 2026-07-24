@@ -9,7 +9,10 @@
 
 body {
   margin: 0;
-  background: #101214;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 85, 0, 0.09), transparent 28rem),
+    radial-gradient(circle at 82% 14%, rgba(25, 211, 197, 0.06), transparent 24rem),
+    #101214;
 }
 
 button {
@@ -17,9 +20,102 @@ button {
 }
 
 .hero-shell {
+  position: relative;
+  overflow: hidden;
   background:
-    linear-gradient(135deg, rgba(17, 20, 24, 0.96) 0%, rgba(23, 27, 32, 0.94) 48%, rgba(16, 18, 20, 1) 100%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 88px);
+    linear-gradient(135deg, rgba(17, 20, 24, 0.94) 0%, rgba(23, 27, 32, 0.92) 48%, rgba(16, 18, 20, 0.98) 100%),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: auto, 72px 72px, 72px 72px;
+}
+
+.hero-shell > .mx-auto {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  text-shadow: 0 20px 70px rgba(255, 85, 0, 0.16);
+}
+
+.arena-radar {
+  position: absolute;
+  right: max(2rem, calc((100vw - 1280px) / 2));
+  top: 3rem;
+  width: min(42vw, 520px);
+  aspect-ratio: 1;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.arena-radar::before {
+  content: "";
+  position: absolute;
+  inset: 15%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(25, 211, 197, 0.16) 0 2px, transparent 3px),
+    conic-gradient(from 210deg, rgba(25, 211, 197, 0.24), rgba(255, 85, 0, 0.04), transparent 42%);
+  mask-image: radial-gradient(circle, black 42%, transparent 43%);
+}
+
+.radar-ring {
+  position: absolute;
+  border: 1px solid rgba(25, 211, 197, 0.16);
+  border-radius: 999px;
+}
+
+.ring-one {
+  inset: 20%;
+}
+
+.ring-two {
+  inset: 34%;
+  border-color: rgba(255, 85, 0, 0.18);
+}
+
+.radar-line {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  width: 1px;
+  height: 72%;
+  background: linear-gradient(transparent, rgba(25, 211, 197, 0.32), transparent);
+  transform-origin: center;
+}
+
+.line-one {
+  transform: rotate(45deg);
+}
+
+.line-two {
+  transform: rotate(-45deg);
+}
+
+.radar-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ff5500;
+  box-shadow: 0 0 24px rgba(255, 85, 0, 0.7);
+}
+
+.dot-one {
+  left: 58%;
+  top: 32%;
+}
+
+.dot-two {
+  left: 36%;
+  top: 55%;
+  background: #19d3c5;
+  box-shadow: 0 0 24px rgba(25, 211, 197, 0.58);
+}
+
+.dot-three {
+  left: 70%;
+  top: 66%;
 }
 
 .command-panel {
@@ -28,6 +124,21 @@ button {
   background: rgba(24, 28, 32, 0.92);
   box-shadow: 0 18px 55px rgba(0, 0, 0, 0.22);
   padding: 1rem;
+}
+
+.command-panel-featured {
+  border-color: rgba(255, 85, 0, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 85, 0, 0.055), transparent 42%),
+    rgba(24, 28, 32, 0.94);
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 85, 0, 0.04) inset;
+}
+
+.info-panel {
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(10px);
 }
 
 .field-label {
@@ -61,7 +172,8 @@ button {
   justify-content: center;
   gap: 0.5rem;
   border-radius: 0.375rem;
-  background: #ff5500;
+  background: linear-gradient(135deg, #ff5500, #ff7429);
+  box-shadow: 0 12px 32px rgba(255, 85, 0, 0.24);
   padding: 0.75rem 1.1rem;
   font-weight: 700;
   color: white;
@@ -73,7 +185,7 @@ button {
 }
 
 .primary-button:hover {
-  background: #ff6d24;
+  background: linear-gradient(135deg, #ff671a, #ff8848);
 }
 
 .primary-button:disabled {
@@ -92,6 +204,21 @@ button {
   padding: 0.65rem 1rem;
   color: #f4f4f5;
   font-weight: 700;
+}
+
+.secondary-button,
+.icon-button,
+.player-card,
+.command-panel,
+.rounded.border.border-line.bg-panel {
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.player-card:hover,
+.rounded.border.border-line.bg-panel:hover {
+  border-color: rgba(255, 85, 0, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
 }
 
 .secondary-button:hover {
@@ -129,7 +256,9 @@ button {
   justify-content: center;
   border: 1px solid rgba(255, 85, 0, 0.6);
   border-radius: 0.5rem;
-  background: rgba(255, 85, 0, 0.1);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 135, 72, 0.24), transparent 52%),
+    rgba(255, 85, 0, 0.1);
   color: #ff5500;
   font-size: 1.875rem;
   font-weight: 800;
@@ -140,7 +269,9 @@ button {
   overflow: hidden;
   border: 1px solid #2a3036;
   border-radius: 0.5rem;
-  background: #181c20;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 36%),
+    #181c20;
   padding: 1rem;
 }
 
@@ -165,4 +296,13 @@ button {
   font-size: 0.75rem;
   font-weight: 800;
   padding: 0.3rem 0.65rem;
+}
+
+@media (max-width: 900px) {
+  .arena-radar {
+    right: -8rem;
+    top: 8rem;
+    width: 24rem;
+    opacity: 0.28;
+  }
 }

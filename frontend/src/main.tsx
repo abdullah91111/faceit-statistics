@@ -89,6 +89,15 @@ function App() {
   return (
     <main className="min-h-screen bg-ink text-zinc-100">
       <section className="hero-shell border-b border-line">
+        <div className="arena-radar" aria-hidden="true">
+          <div className="radar-ring ring-one" />
+          <div className="radar-ring ring-two" />
+          <div className="radar-line line-one" />
+          <div className="radar-line line-two" />
+          <div className="radar-dot dot-one" />
+          <div className="radar-dot dot-two" />
+          <div className="radar-dot dot-three" />
+        </div>
         <div className="mx-auto flex min-h-[620px] max-w-7xl flex-col gap-7 px-5 py-8 lg:px-8">
           <header className="flex flex-col gap-5">
             <div>
@@ -96,7 +105,7 @@ function App() {
                 <Crosshair size={15} />
                 FACEIT CS2 Team Analyzer
               </div>
-              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal md:text-6xl">Know your match before the first round.</h1>
+              <h1 className="hero-title mt-3 max-w-4xl text-4xl font-semibold tracking-normal md:text-6xl">Know your match before the first round.</h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300">
                 Paste a FACEIT CS2 match room link and get both teams auto-filled, role detection, win chance, enemy scouting, and map/player signals calculated from FACEIT stats.
               </p>
@@ -104,7 +113,7 @@ function App() {
           </header>
 
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <div className="command-panel">
+            <div className="command-panel command-panel-featured">
               <label className="field-label" htmlFor="matchId">
                 <Link size={18} />
                 Match ID or FACEIT room URL
@@ -168,7 +177,7 @@ function App() {
 
 function HowItWorks() {
   return (
-    <div className="rounded border border-line bg-panel/90 p-5">
+    <div className="info-panel rounded border border-line bg-panel/90 p-5">
       <h2 className="flex items-center gap-2 text-base font-semibold"><Activity size={18} /> What you get</h2>
       <div className="mt-4 grid gap-3">
         <FeatureLine title="Auto rosters" text="Reads both teams from the FACEIT match." />
