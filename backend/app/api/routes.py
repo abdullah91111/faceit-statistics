@@ -5,11 +5,14 @@ from app.models.schemas import (
     MatchAnalysisRequest,
     MatchAnalysisResponse,
     MatchRosterAnalysisResponse,
+    MatchSummaryRequest,
+    MatchSummaryResponse,
     Player,
     TeamAnalysisRequest,
     TeamCompatibilityResponse,
 )
 from app.services.faceit_client import FaceitClient
+from app.services.azure_summary import create_match_summary
 from app.services.team_analysis import analyze_match, analyze_team
 
 router = APIRouter()
@@ -27,7 +30,7 @@ async def config_status() -> dict[str, bool]:
         "faceit_api_key": settings.has_faceit_api_key,
         "database_url": settings.has_database_url,
         "database_required_for_mvp": False,
-        "llm_enabled": False,
+        "llm_enabled": settings.has_azure_openai,
     }
 
 
@@ -54,3 +57,8 @@ async def post_team_analysis(payload: TeamAnalysisRequest) -> TeamCompatibilityR
 @router.post("/analyze/match", response_model=MatchAnalysisResponse)
 async def post_match_analysis(payload: MatchAnalysisRequest) -> MatchAnalysisResponse:
     return analyze_match(payload)
+
+
+@router.post("/summary/match", response_model=MatchSummaryResponse)
+async def post_match_summary(payload: MatchSummaryRequest) -> MatchSummaryResponse:
+    return await create_match_summary(payload)

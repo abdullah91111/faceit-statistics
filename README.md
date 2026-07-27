@@ -75,6 +75,16 @@ Set this environment variable in Vercel:
 FACEIT_API_KEY=your_faceit_api_key
 ```
 
+Optional Azure AI summary feature:
+
+```env
+AZURE_OPENAI_RESPONSES_ENDPOINT=https://taufiq44-3571-resource.services.ai.azure.com/openai/v1/responses
+AZURE_OPENAI_API_KEY=your_azure_ai_foundry_key
+AZURE_OPENAI_MODEL=your_azure_deployment_name
+```
+
+`AZURE_OPENAI_MODEL` must be the deployment name shown in Azure AI Foundry, not necessarily the base model name. The app still calculates stats locally; Azure is only used to turn the calculated match analysis into a readable summary.
+
 In production, the frontend calls the backend through `/api`, for example:
 
 ```text

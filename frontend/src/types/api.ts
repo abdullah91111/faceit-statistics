@@ -97,3 +97,9 @@ export interface MatchRosterAnalysisResponse {
   teams: MatchRosterTeam[];
   analysis: MatchAnalysisResponse;
 }
+
+export interface MatchSummaryResponse {
+  summary: string;
+  generated_by: string;
+  configured: boolean;
+}

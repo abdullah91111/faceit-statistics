@@ -11,6 +11,9 @@ BACKEND_DIR = Path(__file__).resolve().parents[2]
 class Settings(BaseSettings):
     faceit_api_key: str | None = Field(default=None, alias="FACEIT_API_KEY")
     database_url: str | None = Field(default=None, alias="DATABASE_URL")
+    azure_openai_responses_endpoint: str | None = Field(default=None, alias="AZURE_OPENAI_RESPONSES_ENDPOINT")
+    azure_openai_api_key: str | None = Field(default=None, alias="AZURE_OPENAI_API_KEY")
+    azure_openai_model: str | None = Field(default=None, alias="AZURE_OPENAI_MODEL")
     cors_origins_raw: str = Field(default="http://localhost:5173", alias="CORS_ORIGINS")
 
     model_config = SettingsConfigDict(
@@ -29,6 +32,17 @@ class Settings(BaseSettings):
     @property
     def has_database_url(self) -> bool:
         return bool(self.database_url and self.database_url.strip())
+
+    @property
+    def has_azure_openai(self) -> bool:
+        return bool(
+            self.azure_openai_responses_endpoint
+            and self.azure_openai_responses_endpoint.strip()
+            and self.azure_openai_api_key
+            and self.azure_openai_api_key.strip()
+            and self.azure_openai_model
+            and self.azure_openai_model.strip()
+        )
 
 
 @lru_cache

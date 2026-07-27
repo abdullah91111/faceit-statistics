@@ -124,3 +124,15 @@ class MatchRosterAnalysisResponse(BaseModel):
     faceit_url: str | None = None
     teams: list[MatchRosterTeam]
     analysis: MatchAnalysisResponse
+
+
+class MatchSummaryRequest(BaseModel):
+    match_id: str | None = None
+    team_names: list[str] = Field(default_factory=list, max_length=2)
+    analysis: MatchAnalysisResponse
+
+
+class MatchSummaryResponse(BaseModel):
+    summary: str
+    generated_by: str
+    configured: bool

@@ -1,4 +1,4 @@
-import type { MatchAnalysisResponse, MatchRosterAnalysisResponse, Player, TeamCompatibilityResponse } from "../types/api";
+import type { MatchAnalysisResponse, MatchRosterAnalysisResponse, MatchSummaryResponse, Player, TeamCompatibilityResponse } from "../types/api";
 
 const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? "/api" : "http://localhost:8001");
 
@@ -38,4 +38,15 @@ export function analyzeMatch(friendly: Player[], enemy: Player[]): Promise<Match
 export function analyzeMatchId(matchIdOrUrl: string): Promise<MatchRosterAnalysisResponse> {
   const matchId = matchIdOrUrl.trim().replace(/\/$/, "").split("/").pop() ?? matchIdOrUrl;
   return request<MatchRosterAnalysisResponse>(`/match/${encodeURIComponent(matchId)}/analysis`);
+}
+
+export function createMatchSummary(payload: {
+  match_id?: string;
+  team_names: string[];
+  analysis: MatchAnalysisResponse;
+}): Promise<MatchSummaryResponse> {
+  return request<MatchSummaryResponse>("/summary/match", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }

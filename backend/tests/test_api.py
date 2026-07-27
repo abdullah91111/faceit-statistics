@@ -24,6 +24,21 @@ def test_api_prefix_routes_for_vercel() -> None:
     assert match.json()["match_id"] == "demo-match"
 
 
+def test_match_summary_without_azure_config() -> None:
+    match = client.get("/match/demo-match/analysis").json()
+    response = client.post(
+        "/summary/match",
+        json={
+            "match_id": match["match_id"],
+            "team_names": [team["name"] for team in match["teams"]],
+            "analysis": match["analysis"],
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["configured"] is False
+
+
 def test_demo_player_lookup() -> None:
     response = client.get("/player/mirage_mind")
     assert response.status_code == 200
