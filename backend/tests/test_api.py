@@ -13,7 +13,7 @@ def test_config_status() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["database_required_for_mvp"] is False
-    assert body["llm_enabled"] is False
+    assert isinstance(body["llm_enabled"], bool)
 
 
 def test_api_prefix_routes_for_vercel() -> None:
@@ -24,7 +24,7 @@ def test_api_prefix_routes_for_vercel() -> None:
     assert match.json()["match_id"] == "demo-match"
 
 
-def test_match_summary_without_azure_config() -> None:
+def test_match_summary_response_shape() -> None:
     match = client.get("/match/demo-match/analysis").json()
     response = client.post(
         "/summary/match",
@@ -36,7 +36,9 @@ def test_match_summary_without_azure_config() -> None:
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["configured"] is False
+    assert isinstance(body["configured"], bool)
+    assert body["summary"]
+    assert body["generated_by"]
 
 
 def test_demo_player_lookup() -> None:

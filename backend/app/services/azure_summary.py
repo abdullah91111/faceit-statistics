@@ -31,8 +31,6 @@ async def create_match_summary(payload: MatchSummaryRequest) -> MatchSummaryResp
                 "content": build_prompt(payload),
             },
         ],
-        "temperature": 0.35,
-        "max_output_tokens": 700,
     }
 
     headers = {
