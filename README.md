@@ -78,7 +78,7 @@ FACEIT_API_KEY=your_faceit_api_key
 Optional Azure AI summary feature:
 
 ```env
-AZURE_OPENAI_RESPONSES_ENDPOINT=https://taufiq44-3571-resource.services.ai.azure.com/openai/v1/responses
+AZURE_OPENAI_RESPONSES_ENDPOINT=https://ai.azure.com/openai/v1/responses
 AZURE_OPENAI_API_KEY=your_azure_ai_foundry_key
 AZURE_OPENAI_MODEL=your_azure_deployment_name
 ```
